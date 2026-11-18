@@ -1,0 +1,7 @@
+# Created on the server: secrets, user database, data and logins. Never commit these.
+.env
+secrets/
+data/
+home/
+authelia/*
+!authelia/configuration.yml

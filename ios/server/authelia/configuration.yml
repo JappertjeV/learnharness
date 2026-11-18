@@ -1,0 +1,63 @@
+# Authelia: the login in front of LearnHarness. One user, password login.
+# Secrets are not here but in ../secrets (see README). LH_DOMAIN comes from .env.
+
+theme: auto
+
+server:
+  # Authelia on a sub-path of the same domain: one hostname for everything.
+  address: tcp://:9091/auth
+
+log:
+  level: info
+
+# Passkeys work in the browser; on iOS they failed with Authelia 4.39.28 ("appid" extension
+# output), so the example uses a password. Change the policy to two_factor for more security.
+webauthn:
+  disable: false
+  display_name: LearnHarness
+  enable_passkey_login: true
+
+totp:
+  disable: true
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    watch: true
+    password:
+      algorithm: argon2
+  password_reset:
+    # No mail server: a forgotten password = run set-password.sh again.
+    disable: true
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: '{{ env "LH_DOMAIN" }}'
+      policy: one_factor
+
+session:
+  # The iOS app copies this cookie into its web view (see the app's AppModel.sessionCookie).
+  name: lh_session
+  same_site: lax
+  inactivity: 2w
+  expiration: 4w
+  remember_me: 3M
+  cookies:
+    - domain: '{{ env "LH_DOMAIN" }}'
+      authelia_url: 'https://{{ env "LH_DOMAIN" }}/auth'
+      default_redirection_url: 'https://{{ env "LH_DOMAIN" }}/'
+
+regulation:
+  # 5 failed attempts within 10 minutes: blocked for 30 minutes.
+  max_retries: 5
+  find_time: 10m
+  ban_time: 30m
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt

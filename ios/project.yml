@@ -1,0 +1,75 @@
+# XcodeGen-beschrijving van de app; `xcodegen generate` maakt LearnHarness.xcodeproj.
+# Het .xcodeproj staat niet in git: dit bestand is de bron.
+name: LearnHarness
+# Eigen gegevens (team, bundel-ID, standaardserver) staan in Local.xcconfig, buiten git.
+# Eerste keer: cp Local.xcconfig.example Local.xcconfig en invullen.
+configFiles:
+  Debug: Local.xcconfig
+  Release: Local.xcconfig
+options:
+  deploymentTarget:
+    iOS: "27.0"
+  createIntermediateGroups: true
+  # Engels is de bron; Nederlands via de String Catalogs (Localizable/InfoPlist.xcstrings).
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.3.0"
+    CURRENT_PROJECT_VERSION: "3"
+    # Ondertekenen: DEVELOPMENT_TEAM uit Local.xcconfig, alleen nodig voor een echt toestel.
+    CODE_SIGN_STYLE: Automatic
+targets:
+  LearnHarness:
+    type: application
+    platform: iOS
+    sources:
+      - path: LearnHarness
+        excludes: ["Resources/**", "AppIcon.icon/**"]
+      - path: LearnHarness/Resources
+        buildPhase: resources
+      - path: LearnHarness/AppIcon.icon
+        buildPhase: resources
+        type: file
+    info:
+      path: LearnHarness/Info.plist
+      properties:
+        CFBundleDisplayName: LearnHarness
+        # Voorgevuld serveradres (leeg = de app vraagt erom); zie Local.xcconfig.
+        LHDefaultServer: $(LH_DEFAULT_SERVER)
+        UILaunchScreen:
+          UIColorName: LHBackground
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIUserInterfaceStyle: Dark
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight, UIInterfaceOrientationPortraitUpsideDown]
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        # Alleen voor de lokale testserver in de simulator (http://localhost); de echte server is https.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        NSMicrophoneUsageDescription: Used to dictate your answers and your thinking.
+        NSCameraUsageDescription: Used to add a photo as an attachment to your lesson.
+        NSPhotoLibraryUsageDescription: Used to add an image as an attachment to your lesson.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(LH_BUNDLE_PREFIX).learnharness
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  LearnHarnessTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [LearnHarnessTests]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: LearnHarness
+schemes:
+  LearnHarness:
+    build:
+      targets:
+        LearnHarness: all
+        LearnHarnessTests: [test]
+    test:
+      targets: [LearnHarnessTests]
