@@ -32,7 +32,7 @@ const { createSubscriptions, loadSubscriptionSDK } = require("./subscriptions.cj
 const { attachSubscriptionChild, subscriptionControl } = require("./subscription-ipc.cjs");
 const { desktopAPIHeaders } = require("./desktop-api.cjs");
 const { openWebSubscriptionBrowser } = require("./web-subscription-browser.cjs");
-const { readRemoteServer, uniqueName, uploadFile, uploadFolder, AGENT_DIR } = require("./remote-server.cjs");
+const { readRemoteServer, writeRemoteServer, normalizeServer, uniqueName, uploadFile, uploadFolder, AGENT_DIR } = require("./remote-server.cjs");
 const { randomBytes } = require("node:crypto");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs");
@@ -627,12 +627,78 @@ function applyZoom(win, factor) {
 
 /** macOS needs an application menu with the Edit roles — without one,
  *  Cmd+C/V/A do nothing in the renderer. Everything else stays minimal. */
+/* ── Server Address window (fork, remote-server mode) ─────────────────────
+ * A small modal: shows the current server, saves a new one or removes it
+ * (local mode). The mode is chosen once at startup, so a change restarts
+ * the app — relaunch + quit, so before-quit still stops a local server. */
+let serverSetupWindow = null;
+
+function openServerSetup() {
+	if (serverSetupWindow && !serverSetupWindow.isDestroyed()) { serverSetupWindow.focus(); return; }
+	const parent = [...trustedAppWindows].find((w) => !w.isDestroyed()) ?? null;
+	serverSetupWindow = new BrowserWindow({
+		parent, modal: Boolean(parent), width: 460, height: 236, resizable: false,
+		minimizable: false, maximizable: false, fullscreenable: false, show: false,
+		title: "Server Address", backgroundColor: chromeColors(appearance).color,
+		webPreferences: {
+			contextIsolation: true, sandbox: true, nodeIntegration: false,
+			preload: path.join(__dirname, "server-setup-preload.cjs"),
+		},
+	});
+	const win = serverSetupWindow;
+	win.webContents.on("will-navigate", (event) => event.preventDefault());
+	win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+	win.once("ready-to-show", () => win.show());
+	win.once("closed", () => { if (serverSetupWindow === win) serverSetupWindow = null; });
+	void win.loadFile(path.join(__dirname, "server-setup.html"));
+}
+
+function restartForServerChange() {
+	log("server address changed — restarting");
+	app.relaunch();
+	app.quit();
+}
+
+ipcMain.handle("lh:server-setup", (event, command) => {
+	const win = serverSetupWindow;
+	// Only the setup window itself may read or change the server.
+	if (!win || win.isDestroyed() || event.sender !== win.webContents) throw new Error("Untrusted request.");
+	const userData = app.getPath("userData");
+	switch (command?.op) {
+		case "get": {
+			const url = readRemoteServer(userData);
+			return { url, remote: Boolean(url) };
+		}
+		case "save": {
+			const origin = normalizeServer(command.url);
+			if (!origin) return { error: "Enter a secure (https) address, such as learn.example.com." };
+			if (origin === readRemoteServer(userData)) { win.close(); return { ok: true }; }
+			writeRemoteServer(userData, origin);
+			log(`server address set: ${origin}`);
+			restartForServerChange();
+			return { ok: true };
+		}
+		case "local":
+			writeRemoteServer(userData, null);
+			log("server address removed — local mode");
+			restartForServerChange();
+			return { ok: true };
+		case "cancel":
+			win.close();
+			return { ok: true };
+		default:
+			throw new Error("Unsupported request.");
+	}
+});
+
 function installMenu() {
 	const template = [
 		{
 			label: app.name,
 			submenu: [
 				{ role: "about" },
+				// Fork: pick the remote server (or go back to this Mac); see remote-server.cjs.
+				{ label: "Server Address…", click: () => openServerSetup() },
 				// Manual checks report their result in Settings → General.
 				{ label: "Check for Updates…", click: () => checkForUpdatesFromMenu() },
 				{ type: "separator" },

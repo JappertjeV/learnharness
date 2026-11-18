@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, existsSync, mkdtempSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { it } from "node:test";
-const { readRemoteServer, normalizeServer, safeName, uniqueName, uploadFile, uploadFolder, NAME_RE } =
+const { readRemoteServer, writeRemoteServer, normalizeServer, safeName, uniqueName, uploadFile, uploadFolder, NAME_RE } =
 	createRequire(import.meta.url)("../electron/remote-server.cjs");
 
 function tempDir() {
@@ -99,4 +99,25 @@ it("an empty folder is refused instead of handing the agent a missing path", asy
 		writeFileSync(path.join(dir, ".hidden"), "x");
 		await assert.rejects(uploadFolder(fakeSession(), "https://learn.example.com", dir), /no files/);
 	} finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+it("writeRemoteServer saves a readable server.json (0600) and null goes back to local mode", () => {
+	const dir = tempDir();
+	try {
+		writeRemoteServer(dir, "https://learn.example.com");
+		assert.equal(readRemoteServer(dir), "https://learn.example.com");
+		assert.equal(statSync(path.join(dir, "server.json")).mode & 0o777, 0o600);
+		assert.deepEqual(readdirSync(dir), ["server.json"], "no temp file left behind");
+		writeRemoteServer(dir, null);
+		assert.equal(existsSync(path.join(dir, "server.json")), false);
+		writeRemoteServer(dir, null); // already local: no error
+		assert.throws(() => writeRemoteServer(dir, "learn.example.com"), /normalized/);
+		assert.throws(() => writeRemoteServer(dir, "http://learn.example.com"), /normalized/);
+	} finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+it("the Server Address window is registered in the app menu and only answers its own window", () => {
+	const main = readFileSync(new URL("../electron/main.cjs", import.meta.url), "utf8");
+	assert.match(main, /label: "Server Address…", click: \(\) => openServerSetup\(\)/);
+	assert.match(main, /event\.sender !== win\.webContents\) throw new Error\("Untrusted request\."\)/);
 });

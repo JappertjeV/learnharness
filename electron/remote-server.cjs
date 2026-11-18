@@ -39,6 +39,22 @@ function readRemoteServer(userDataDir) {
 	return normalizeServer(raw?.url);
 }
 
+/** Saves the server (an origin from normalizeServer) or, with null, removes
+ *  server.json so the next start is upstream's local mode. Atomic: a crash
+ *  mid-write never leaves half a file that would silently mean "local". */
+function writeRemoteServer(userDataDir, origin) {
+	const file = path.join(userDataDir, CONFIG_FILE);
+	if (origin === null) {
+		fs.rmSync(file, { force: true });
+		return;
+	}
+	if (normalizeServer(origin) !== origin) throw new Error("not a normalized server origin");
+	fs.mkdirSync(userDataDir, { recursive: true });
+	const tmp = `${file}.${process.pid}.tmp`;
+	fs.writeFileSync(tmp, `${JSON.stringify({ url: origin }, null, 2)}\n`, { mode: 0o600 });
+	fs.renameSync(tmp, file);
+}
+
 function normalizeServer(input) {
 	if (typeof input !== "string" || !input.trim()) return null;
 	let text = input.trim();
@@ -127,4 +143,4 @@ async function uploadFolder(ses, origin, localDir, top = uniqueName(path.basenam
 	return `${AGENT_DIR}/${top}`;
 }
 
-module.exports = { readRemoteServer, normalizeServer, safeName, uniqueName, uploadFile, uploadFolder, AGENT_DIR, NAME_RE };
+module.exports = { readRemoteServer, writeRemoteServer, normalizeServer, safeName, uniqueName, uploadFile, uploadFolder, AGENT_DIR, NAME_RE };

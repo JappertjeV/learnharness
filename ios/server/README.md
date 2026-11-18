@@ -45,15 +45,13 @@ Open `https://<your domain>` in a browser to check, then enter the same address 
 ## The Mac app on the same server
 
 This fork's desktop app can open your server instead of running its own (same sessions and
-knowledge graph on the Mac and the phone). Build it from this fork, then create
-`~/Library/Application Support/LearnHarness/server.json`:
+knowledge graph on the Mac and the phone). Build it from this fork, start it and choose
+**LearnHarness → Server Address…**, enter your server and press **Connect**; the app restarts
+and you sign in on the server's login page inside the app window. **Use This Mac** in the same
+window goes back to upstream's behavior (local server, local data).
 
-```json
-{ "url": "https://learn.example.com" }
-```
-
-and start the app. You sign in on the server's login page inside the app window. Without
-`server.json` the app behaves exactly like upstream (local server, local data).
+The choice is stored in `~/Library/Application Support/LearnHarness/server.json`
+(`{ "url": "https://learn.example.com" }`); without that file nothing differs from upstream.
 
 In this mode the app:
 
