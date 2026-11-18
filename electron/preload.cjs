@@ -42,11 +42,23 @@ ipcRenderer.on("lh:open-settings", (_event, section) => {
 	else pendingOpenSettings = section;
 });
 
+// Remote-server mode (fork, electron/remote-server.cjs): a Mac path means
+// nothing to a server elsewhere. Main uploads the picked file and answers at
+// once with the path the agent will see on the server. Only a real, OS-backed
+// File resolves to a local path; page script can't name one.
+const REMOTE = process.argv?.includes("--lh-remote");
+function pathForFile(file) {
+	const local = webUtils.getPathForFile(file);
+	if (!REMOTE || !local) return local;
+	return ipcRenderer.sendSync("lh:remote:upload-file", local) ?? "";
+}
+
 contextBridge.exposeInMainWorld("lh", {
 	platform: process.platform,
 	// Resolve only a renderer-supplied, OS-backed File. No filesystem API,
 	// uploads, copies, or DOM File IPC to main; sandbox/isolation stay on.
-	getPathForFile: (file) => webUtils.getPathForFile(file),
+	// (Remote mode: main uploads that file — see pathForFile above.)
+	getPathForFile: (file) => pathForFile(file),
 	chooseAttachmentFolder: () => ipcRenderer.invoke("lh:attachment:pick", "folder"),
 	...(process.argv?.includes("--lh-web-subscriptions") ? {
 		subscriptionTransport: "web",

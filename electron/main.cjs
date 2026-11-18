@@ -32,6 +32,7 @@ const { createSubscriptions, loadSubscriptionSDK } = require("./subscriptions.cj
 const { attachSubscriptionChild, subscriptionControl } = require("./subscription-ipc.cjs");
 const { desktopAPIHeaders } = require("./desktop-api.cjs");
 const { openWebSubscriptionBrowser } = require("./web-subscription-browser.cjs");
+const { readRemoteServer, uniqueName, uploadFile, uploadFolder, AGENT_DIR } = require("./remote-server.cjs");
 const { randomBytes } = require("node:crypto");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs");
@@ -156,6 +157,9 @@ let subscriptionChild = null;
 let desktopAPISecret = null;
 let reopenWindow = null;
 const trustedAppWindows = new Set();
+// Remote-server mode (fork): userData/server.json names a server to open
+// instead of spawning one here. See electron/remote-server.cjs.
+let remoteMode = false;
 
 // A GUI shell must never die to a stray exception (EPIPE dialogs, a race
 // in an event handler): the window + child server are the product, and
@@ -348,6 +352,8 @@ function createWindow(url) {
 			sandbox: true,
 			nodeIntegration: false,
 			...(process.env.LH_DEV_URL ? { additionalArguments: ["--lh-web-subscriptions"] } : {}),
+			// Preload swaps file paths for uploads to the server (remote-server.cjs).
+			...(remoteMode ? { additionalArguments: ["--lh-remote"] } : {}),
 			preload: path.join(__dirname, "preload.cjs"),
 		},
 		// Live-resize + first-paint flash (owner, 2026-09-17): during a resize
@@ -401,6 +407,14 @@ function createWindow(url) {
 	win.webContents.setWindowOpenHandler(({ url: target }) => {
 		openExternalLink(target);
 		return { action: "deny" };
+	});
+
+	// Remote mode: an unreachable server (offline, VPN down) would leave a blank
+	// window. Show why, with a retry that navigates back to the server origin.
+	win.webContents.on("did-fail-load", (_event, code, description, _failedURL, isMainFrame) => {
+		if (!remoteMode || !isMainFrame || code === -3 /* aborted, e.g. a redirect */) return;
+		const page = `<!doctype html><meta charset="utf-8"><body style="font:15px -apple-system,sans-serif;background:#141414;color:#e5e5e5;display:grid;place-items:center;height:100vh;margin:0"><div style="text-align:center"><h2 style="font-weight:500">Can't reach the LearnHarness server</h2><p style="color:#999">${new URL(url).host} · ${String(description).replace(/[<&]/g, "")}</p><p><a style="color:#e5e5e5" href="${url}/">Try again</a></p></div>`;
+		void win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(page)}`);
 	});
 
 	void win.loadURL(url);
@@ -690,8 +704,15 @@ async function main() {
 	// spawn, no packaging, full HMR. The rest of this shell still applies
 	// (guards, menu, single instance).
 	const devUrl = process.env.LH_DEV_URL;
-	const url = devUrl ?? `http://127.0.0.1:${await freePort()}`;
-	if (!devUrl) {
+	// Remote-server mode: no local server, no local data, no desktop secret,
+	// no ChatGPT/subscription brokers (those need the private local server;
+	// providers are configured on the server instead).
+	const remoteUrl = devUrl ? null : readRemoteServer(app.getPath("userData"));
+	remoteMode = Boolean(remoteUrl);
+	const url = devUrl ?? remoteUrl ?? `http://127.0.0.1:${await freePort()}`;
+	if (remoteUrl) {
+		log(`remote server: ${remoteUrl} (userData/server.json) — no local server`);
+	} else if (!devUrl) {
 		desktopAPISecret = randomBytes(32).toString("hex");
 		const ownedOrigin = new URL(url).origin;
 		// All URLs, not only /api: remove the header again on external redirects.
@@ -766,9 +787,46 @@ async function main() {
 		await openWebSubscriptionBrowser(action, new URL(url).origin, { openExternal: (target) => shell.openExternal(target) });
 	});
 
-	ipcMain.handle("lh:attachment:pick", (event, mode) => pickAttachmentPath(event, mode, {
-		BrowserWindow, dialog, trustedAppWindows, origin: new URL(url).origin,
-	}));
+	ipcMain.handle("lh:attachment:pick", async (event, mode) => {
+		const chosen = await pickAttachmentPath(event, mode, {
+			BrowserWindow, dialog, trustedAppWindows, origin: new URL(url).origin,
+		});
+		if (!remoteMode || chosen === null) return chosen;
+		// The server can't read a Mac folder: upload it and hand back its server path.
+		try {
+			return await uploadFolder(session.defaultSession, url, chosen);
+		} catch (err) {
+			void dialog.showMessageBox(BrowserWindow.fromWebContents(event.sender), {
+				type: "warning", message: "Couldn't upload the folder", detail: `${path.basename(chosen)}: ${err?.message ?? err}`,
+			});
+			return null;
+		}
+	});
+
+	// Remote mode, paperclip/drop → file: preload asks synchronously (the
+	// renderer's getPathForFile is sync), gets the server path at once, and the
+	// upload runs in the background. The agent reads the file only when the
+	// message is sent. The path comes from preload's webUtils.getPathForFile —
+	// a real, user-picked file — never from page script.
+	ipcMain.on("lh:remote:upload-file", (event, localPath) => {
+		event.returnValue = null;
+		if (!remoteMode || typeof localPath !== "string" || !path.isAbsolute(localPath)) return;
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (!trustedAppWindows.has(win) || !trustedSender(event, new URL(url).origin, BrowserWindow)) return;
+		const name = uniqueName(path.basename(localPath));
+		event.returnValue = `${AGENT_DIR}/${name}`;
+		// A folder dropped on the composer resolves to a path too: upload it whole.
+		let isDir = false;
+		try { isDir = fs.statSync(localPath).isDirectory(); } catch { /* uploadFile reports it */ }
+		const upload = isDir ? uploadFolder(session.defaultSession, url, localPath, name) : uploadFile(session.defaultSession, url, localPath, name);
+		upload.catch((err) => {
+			log(`upload failed: ${err?.message ?? err}`);
+			void dialog.showMessageBox(win, {
+				type: "warning", message: "Couldn't upload an attachment",
+				detail: `${path.basename(localPath)}: ${err?.message ?? err}\n\nThe agent can't read this file. Remove it from your message and attach it again.`,
+			});
+		});
+	});
 
 	installMenu();
 
@@ -776,7 +834,14 @@ async function main() {
 	// banner channel is live from first paint; the first check and the 24h
 	// interval fire after it below. setupAutoUpdater's contract: failures
 	// are log lines — this can never block boot.
-	setupAutoUpdater();
+	// Remote mode never updates itself: this is a fork build, and upstream's
+	// update feed would replace it with a build that has no remote mode.
+	if (remoteMode) {
+		log("auto-update: remote-server mode — updater disabled");
+		reportUpdateStatus("disabled");
+	} else {
+		setupAutoUpdater();
+	}
 	ipcMain.on("lh:update-install", () => installUpdateNow());
 	ipcMain.handle("lh:update:get", (event) => {
 		if (!trustedAppWindows.has(BrowserWindow.fromWebContents(event.sender)) || !trustedSender(event, new URL(url).origin, BrowserWindow)) throw new Error("Untrusted desktop request.");
