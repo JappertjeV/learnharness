@@ -1,0 +1,11 @@
+// Kopieer naar Local.xcconfig (staat niet in git) en vul in.
+// Let op: in .xcconfig begint "//" een commentaar, dus het serveradres zonder https://.
+
+// Apple Team ID voor een echt toestel (Xcode → Settings → Accounts). Leeg = alleen simulator.
+DEVELOPMENT_TEAM =
+
+// Begin van de bundel-ID, bijvoorbeeld com.jouwnaam → com.jouwnaam.learnharness.
+LH_BUNDLE_PREFIX = com.example
+
+// Optioneel: serveradres dat de app voorinvult, bijvoorbeeld learn.example.com.
+LH_DEFAULT_SERVER =

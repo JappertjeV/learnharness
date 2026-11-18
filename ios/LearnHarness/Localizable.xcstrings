@@ -1,0 +1,696 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@: %@. The agent can’t read this file; please add it again." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@. De agent kan dit bestand niet lezen; voeg het opnieuw toe."
+          }
+        }
+      }
+    },
+    "A turn or background task is still running in this session." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er loopt nog een beurt of achtergrondtaak in deze sessie."
+          }
+        }
+      }
+    },
+    "Actual Size (%lld%%)" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ware grootte (%lld%%)"
+          }
+        }
+      }
+    },
+    "All" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles"
+          }
+        }
+      }
+    },
+    "An agent harness for learning." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een agent-harness om mee te leren."
+          }
+        }
+      }
+    },
+    "At most %lld files and %lld MB per folder. This folder has %lld files (%lld MB)." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoogstens %1$lld bestanden en %2$lld MB per map. Deze map heeft %3$lld bestanden (%4$lld MB)."
+          }
+        }
+      }
+    },
+    "At most %lld files and 100 MB per folder." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoogstens %lld bestanden en 100 MB per map."
+          }
+        }
+      }
+    },
+    "Attaching folder" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map toevoegen"
+          }
+        }
+      }
+    },
+    "Attachment not uploaded" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bijlage niet geüpload"
+          }
+        }
+      }
+    },
+    "Background agents" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtergrondagenten"
+          }
+        }
+      }
+    },
+    "Camera" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuleer"
+          }
+        }
+      }
+    },
+    "Couldn’t delete the session." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijderen lukte niet."
+          }
+        }
+      }
+    },
+    "Couldn’t save the session." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De sessie kon niet worden opgeslagen."
+          }
+        }
+      }
+    },
+    "Couldn’t start extraction." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kon het extraheren niet starten."
+          }
+        }
+      }
+    },
+    "Couldn’t start signing in." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inloggen kon niet starten."
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijder"
+          }
+        }
+      }
+    },
+    "Delete session?" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessie verwijderen?"
+          }
+        }
+      }
+    },
+    "Delete with this session’s nodes" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijder met de nodes uit deze sessie"
+          }
+        }
+      }
+    },
+    "Delete, keep knowledge graph" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijder, kennisgraaf houden"
+          }
+        }
+      }
+    },
+    "Delete…" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijder…"
+          }
+        }
+      }
+    },
+    "Export as Markdown…" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporteren als Markdown…"
+          }
+        }
+      }
+    },
+    "Extract into knowledge graph" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In kennisgraaf zetten"
+          }
+        }
+      }
+    },
+    "File too large" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestand te groot"
+          }
+        }
+      }
+    },
+    "Files" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestanden"
+          }
+        }
+      }
+    },
+    "Folder is empty" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map is leeg"
+          }
+        }
+      }
+    },
+    "Folder too large" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map te groot"
+          }
+        }
+      }
+    },
+    "Knowledge graph" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kennisgraaf"
+          }
+        }
+      }
+    },
+    "LearnHarness" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LearnHarness"
+          }
+        }
+      }
+    },
+    "Lessons" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lessen"
+          }
+        }
+      }
+    },
+    "New lesson" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe les"
+          }
+        }
+      }
+    },
+    "New practice session" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe oefensessie"
+          }
+        }
+      }
+    },
+    "No sessions yet" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog geen sessies"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "Photos" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto’s"
+          }
+        }
+      }
+    },
+    "Plan" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan"
+          }
+        }
+      }
+    },
+    "Planning" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plannen"
+          }
+        }
+      }
+    },
+    "Practice" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oefenen"
+          }
+        }
+      }
+    },
+    "Probing" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peilen"
+          }
+        }
+      }
+    },
+    "Reload" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vernieuw"
+          }
+        }
+      }
+    },
+    "Rename" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hernoem"
+          }
+        }
+      }
+    },
+    "Rename session" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessie hernoemen"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewaar"
+          }
+        }
+      }
+    },
+    "Search sessions" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoek sessies"
+          }
+        }
+      }
+    },
+    "Server unreachable" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server niet bereikbaar"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellingen"
+          }
+        }
+      }
+    },
+    "Show" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toon"
+          }
+        }
+      }
+    },
+    "Sign in" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inloggen"
+          }
+        }
+      }
+    },
+    "Sign out" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uitloggen"
+          }
+        }
+      }
+    },
+    "Some files weren’t attached" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niet alle bestanden zijn toegevoegd"
+          }
+        }
+      }
+    },
+    "Something went wrong" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niet gelukt"
+          }
+        }
+      }
+    },
+    "Start a lesson with New lesson." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begin een les met Nieuwe les."
+          }
+        }
+      }
+    },
+    "Teaching" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les"
+          }
+        }
+      }
+    },
+    "The server didn’t return a session. Please try again." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De server gaf geen sessie terug. Probeer het opnieuw."
+          }
+        }
+      }
+    },
+    "There are no files in this folder to attach." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er staan geen bestanden in deze map om toe te voegen."
+          }
+        }
+      }
+    },
+    "Title" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titel"
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opnieuw"
+          }
+        }
+      }
+    },
+    "Uploading %lld of %lld…" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uploaden %1$lld van %2$lld…"
+          }
+        }
+      }
+    },
+    "Waiting for you" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wacht op jou"
+          }
+        }
+      }
+    },
+    "Zoom" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "Zoom In" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inzoomen"
+          }
+        }
+      }
+    },
+    "Zoom Out" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uitzoomen"
+          }
+        }
+      }
+    },
+    "file" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bestand"
+          }
+        }
+      }
+    },
+    "unknown error" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "onbekende fout"
+          }
+        }
+      }
+    },
+    "“%@” will be permanently deleted. This can’t be undone." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt."
+          }
+        }
+      }
+    },
+    "Server address" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveradres"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ga verder"
+          }
+        }
+      }
+    },
+    "Change server" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere server"
+          }
+        }
+      }
+    },
+    "Enter a secure (https) server address, such as learn.example.com." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vul een beveiligd (https) serveradres in, zoals learn.example.com."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

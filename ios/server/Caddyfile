@@ -1,0 +1,46 @@
+# /auth*        → Authelia (login page and API), no check
+# /app-login    → after login, hands the session to the iOS app (learnharness://login?session=…)
+# /app-upload/* → attachments from the iOS app
+# everything else → forward_auth at Authelia first, then LearnHarness
+# LearnHarness has no login of its own; this proxy is the only way in.
+{$LH_DOMAIN} {
+	# No `encode`: compression buffers, and LearnHarness streams lessons as SSE.
+	header -Server
+
+	handle /auth* {
+		reverse_proxy authelia:9091
+	}
+
+	# `route` keeps the order: without it Caddy runs reverse_proxy before forward_auth.
+	# upload.py percent-encodes the session: Authelia session IDs contain characters like # and %,
+	# which break a URL when pasted in raw.
+	handle /app-login {
+		route {
+			forward_auth authelia:9091 {
+				uri /auth/api/authz/forward-auth
+			}
+			reverse_proxy uploads:8000
+		}
+	}
+
+	handle /app-upload/* {
+		forward_auth authelia:9091 {
+			uri /auth/api/authz/forward-auth
+		}
+		request_body {
+			max_size 50MB
+		}
+		reverse_proxy uploads:8000
+	}
+
+	handle {
+		forward_auth authelia:9091 {
+			uri /auth/api/authz/forward-auth
+			copy_headers Remote-User Remote-Groups Remote-Email Remote-Name
+		}
+		reverse_proxy learnharness:3000 {
+			# Pass SSE (lesson stream and /api/events) straight through.
+			flush_interval -1
+		}
+	}
+}

@@ -1,0 +1,74 @@
+# LearnHarness behind Caddy (HTTPS) and Authelia (login), for the browser and the iOS app.
+# Only Caddy publishes ports; LearnHarness, Authelia and the upload service are internal.
+name: learnharness
+
+services:
+  caddy:
+    image: caddy:2.11.9
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      LH_DOMAIN: ${LH_DOMAIN:?set LH_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [authelia, learnharness, uploads]
+    networks: [front]
+
+  authelia:
+    image: authelia/authelia:4.39.28
+    restart: unless-stopped
+    environment:
+      LH_DOMAIN: ${LH_DOMAIN}
+      # Lets configuration.yml read LH_DOMAIN via {{ env "LH_DOMAIN" }}.
+      X_AUTHELIA_CONFIG_FILTERS: template
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /secrets/jwt_secret
+      AUTHELIA_SESSION_SECRET_FILE: /secrets/session_secret
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /secrets/storage_encryption_key
+    volumes:
+      - ./authelia:/config
+      - ./secrets:/secrets:ro
+    networks: [front]
+
+  learnharness:
+    build:
+      context: .
+      args:
+        LH_REF: ${LH_REF:-v0.6.1}
+        CLAUDE_CODE_VERSION: ${CLAUDE_CODE_VERSION:-2.1.325}
+    image: local/learnharness:${LH_REF:-v0.6.1}
+    restart: unless-stopped
+    environment:
+      # Browser-only mode only accepts localhost, IPs and the names in this list.
+      LH_ALLOWED_HOSTS: ${LH_DOMAIN}
+    volumes:
+      # data/ = sessions, knowledge graph, settings; home/ = Claude Code login and attachments.
+      - ./data:/data
+      - ./home:/home/lh
+    cap_drop: [ALL]
+    mem_limit: 3g
+    networks: [front]
+
+  uploads:
+    image: python:3.13-alpine
+    restart: unless-stopped
+    user: "1500:1500"
+    command: ["python", "/app/upload.py"]
+    volumes:
+      - ./upload.py:/app/upload.py:ro
+      # Same folder as /home/lh/Bijlagen inside the LearnHarness container.
+      - ./home/Bijlagen:/uploads
+    read_only: true
+    cap_drop: [ALL]
+    mem_limit: 128m
+    networks: [front]
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  front: {}
