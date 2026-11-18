@@ -42,6 +42,31 @@ and in LearnHarness: **Settings → Providers → Claude Code**.
 
 Open `https://<your domain>` in a browser to check, then enter the same address in the iOS app.
 
+## The Mac app on the same server
+
+This fork's desktop app can open your server instead of running its own (same sessions and
+knowledge graph on the Mac and the phone). Build it from this fork, then create
+`~/Library/Application Support/LearnHarness/server.json`:
+
+```json
+{ "url": "https://learn.example.com" }
+```
+
+and start the app. You sign in on the server's login page inside the app window. Without
+`server.json` the app behaves exactly like upstream (local server, local data).
+
+In this mode the app:
+
+- starts no local server and leaves its local data alone;
+- uploads attachments (files, folders, drag and drop) to `/app-upload` and gives the agent the
+  server path, since the server can't read paths on your Mac;
+- doesn't update itself (upstream's updates would replace this build);
+- has no ChatGPT or subscription sign-in from the Mac: set up providers on the server.
+
+Build: `npm ci`, `npm run plugins:setup`, `npm run build`, `node scripts/build-server.mjs`, then
+`npx electron-builder --mac --arm64 --dir -c.mac.notarize=false -c.mac.identity=-`. The app is
+in `dist/mac-arm64/`.
+
 ## Notes
 
 - **Behind a tunnel** (for example Cloudflare Tunnel) instead of open ports: let the tunnel

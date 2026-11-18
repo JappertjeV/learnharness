@@ -9,7 +9,8 @@
 <p align="center"><strong>An agent harness for learning.</strong></p>
 
 > **This fork** adds an unofficial **iOS app** (iPhone, including the foldable iPhone Duo) and a
-> self-hosted server setup for it. See [`ios/`](ios/README.md). Everything else is upstream
+> self-hosted server setup for it, and lets the desktop app open that server instead of its own
+> ([how](ios/server/README.md#the-mac-app-on-the-same-server)). See [`ios/`](ios/README.md). Everything else is upstream
 > [amosblomqvist/learnharness](https://github.com/amosblomqvist/learnharness).
 
 <p align="center">
